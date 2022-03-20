@@ -1,0 +1,31 @@
+pipeline {
+    agent none
+    environment {
+        HOME = '.'
+        appName = "basic-crud-app"
+    }
+    stages {
+        stage('Deploy application') {
+            agent {
+                docker {
+                    label 'docker-agent'
+                    image 'hernanku/devops-cli:latest'
+                }
+            }
+            steps {
+                echo 'Running ansible deploy playbook'
+                sh 'ansible-playbook -i inventory.yaml app-deploy.yaml'
+            }
+        }
+        stage('Clean Workspace') {
+            agent any
+            steps {
+                echo 'Cleaning docker images'
+                sh "docker rmi hernanku/devops-cli:latest"
+                echo 'Cleaning workspace'
+                cleanWs()
+            }
+        }
+    }
+}
+
