@@ -78,12 +78,13 @@
         recurse: yes
     
     - name: Stop APP
-      command: "./utils/stop-app.sh"
+      command: utils/stop-app.sh
       args:
         chdir: /app/{{ app_name }}
+      ignore_errors: True
 
     - name: Start APP
-      command: "utils/start-app.sh"
+      command: utils/start-app.sh
       args:
         chdir: /app/{{ app_name }}
     

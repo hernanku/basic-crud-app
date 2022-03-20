@@ -3,4 +3,8 @@ git_repo_url: https://github.com/hernanku/basic-crud-app.git
 git_repo_branch: develop
 app_name: basic-crud-app
 app_port: 3000
+nodejs_version: "13.x"
+nodejs_install_npm_user: root
+npm_config_prefix: /root/.npm-global
+npm_config_unsafe_perm: "true"
 
