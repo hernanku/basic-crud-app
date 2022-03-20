@@ -1,27 +1,37 @@
 pipeline {
-    agent {
-        docker {
-            label 'docker-agent'
-            image 'node:13.12.0'
-        }
-    }
+    agent none
     environment {
         HOME = '.'
     }
     stages {
         stage('Install app dependencies') {
+            agent {
+                docker {
+                    label 'docker-agent'
+                    image 'node:13.12.0'
+                }
+            }
             steps {
                 echo 'Running npm install'
                 sh 'npm install'
             }
         }
         stage('Code Build') {
+            agent {
+                docker {
+                    label 'docker-agent'
+                    image 'node:13.12.0'
+                }
+            }
             steps {
                 echo 'Running npm build'
                 sh 'npm run build'
             }
         }
         stage ('Upload file') {
+            agent {
+                label 'docker-agent'
+            }
             steps {
                 rtServer (
                     id: 'artifactory-test',
@@ -35,7 +45,20 @@ pipeline {
                 )
             }
         }
+        stage ('Docker build') {
+            agent {
+                label 'docker-agent'
+            }
+            steps {
+                echo "Starting docker build"
+                // sh "docker build -t hernanku/basic-crud-app:latest ."
+                script {
+                    def customImage = docker.build("hernanku/basic-crud-app:$BUILD_NUMBER")
+                }
+            }
+        }
         stage('Clean Workspace') {
+            agent any
             steps {
                 echo 'Cleaning workspace'
                 cleanWs()
