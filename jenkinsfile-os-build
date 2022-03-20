@@ -1,0 +1,52 @@
+pipeline {
+    agent none
+    environment {
+        HOME = '.'
+        appName = "basic-crud-app"
+        dockerImage = '' 
+    }
+    stages {
+        stage('Install app dependencies') {
+            agent {
+                docker {
+                    label 'docker-agent'
+                    image 'node:13.12.0'
+                }
+            }
+            steps {
+                echo 'Running npm install'
+                sh 'npm install'
+            }
+        }
+        stage('Code Build') {
+            agent {
+                docker {
+                    label 'docker-agent'
+                    image 'node:13.12.0'
+                }
+            }
+            steps {
+                echo 'Running npm build'
+                sh 'npm run build'
+            }
+        }
+        stage ('Artifact upload') {
+            agent {
+                label 'docker-agent'
+            }
+            steps {
+                rtServer (
+                    id: 'artifactory-test',
+                    url: 'http://10.0.0.64:8082/artifactory',
+                    credentialsId: 'local-artifactory'
+                )
+
+                rtUpload (
+                    serverId: 'artifactory-test',
+                    specPath: 'utils/upload-spec.json'
+                )
+            }
+        }
+    }
+}
+
