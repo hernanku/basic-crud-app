@@ -2,15 +2,6 @@ pipeline {
      agent none
     environment {
         HOME = '.'
-        def uploadSpec = """{
-        "files": [
-            {
-                "pattern": "dist/*",
-                "target": "basic-crud-app/dev/"
-            }
-        ]
-    }"""
-    }
     stages {
         stage('Install app dependencies') {
             agent {
@@ -43,7 +34,22 @@ pipeline {
             steps {
                 rtUpload (
                     serverId: 'artifactory-local',
-                    spec: 'uploadSpec'
+                    credentialsId: 'local-artifactory',
+                    spec: """{
+                        "files": [
+                            {
+                                "pattern": "dist/*",
+                                "target": "basic-crud-app/dev/"
+                            }
+                        ]
+                    }"""
+                )
+            }
+        }
+        stage ('Publish build info') {
+            steps {
+                rtPublishBuildInfo (
+                    serverId: 'artifactory-local'
                 )
             }
         }
