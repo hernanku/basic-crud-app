@@ -35,20 +35,13 @@ pipeline {
             steps {
                 rtServer (
                     id: 'artifactory-test',
-                    url: 'http://10.0.0.64:8082',
+                    url: 'http://10.0.0.64:8082/artifactory',
                     credentialsId: 'local-artifactory'
                 )
 
                 rtUpload (
                     serverId: 'artifactory-test',
                     specPath: './upload-spec.json'
-                )
-            }
-        }
-        stage ('Publish build info') {
-            steps {
-                rtPublishBuildInfo (
-                    serverId: 'artifactory-test'
                 )
             }
         }
