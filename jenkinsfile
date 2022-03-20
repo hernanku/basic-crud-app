@@ -1,32 +1,51 @@
 pipeline {
-    agent none
+     agent none
+    environment {
+        HOME = '.'
+        def uploadSpec = """{
+        "files": [
+            {
+                "pattern": "dist/*",
+                "target": "basic-crud-app/dev/"
+            }
+        ]
+    }"""
+    }
     stages {
-        // stage('Checkout code') {
-        //     steps {
-        //         git branch: 'develop',
-        //             credentialsId: 'jenkins-ssh-priv',
-        //             url: 'https://github.com/hernanku/javascript-projects.git'
-        //     }
-        // }
+        stage('Install app dependencies') {
+            agent {
+                docker {
+                    label 'docker-agent'
+                    image 'node:13.12.0'
+                }
+            }
+            steps {
+                echo 'Running npm install'
+                sh 'npm install'
+            }
+        }
         stage('Code Build') {
             agent {
                 docker {
                     label 'docker-agent'
-                    image 'hernanku/jenkins-agent-node:1.0'
+                    image 'node:13.12.0'
                 }
             }
             steps {
                 echo 'Running npm build'
-                sh 'pwd'
-                sh 'ls -altr'
+                sh 'npm run build'
             }
         }
-        // stage('Package app') {
-        //     steps {
-        //         echo 'packaging app'
-        //         sh 'pwd'
-        //         sh 'ls -altr'
-        //     }
-        // }
+        stage ('Upload file') {
+            agent {
+                label 'docker-agent'
+            }
+            steps {
+                rtUpload (
+                    serverId: aritactory-local,
+                    spec: uploadSpec
+                )
+            }
+        }
     }
 }

@@ -39,6 +39,7 @@ build/Release
 **/node_modules
 **/dist
 jspm_packages/
+**/package-lock.json
 
 # TypeScript v1 declaration files
 typings/
@@ -78,3 +79,8 @@ typings/
 
 # FuseBox cache
 .fusebox/
+
+
+# extra ignore
+**/.bash_history
+**/.config
