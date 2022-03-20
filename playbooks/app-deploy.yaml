@@ -70,12 +70,12 @@
         state: present
 
     - name: Stop APP
-      script: ./utils/stop-app.sh
+      command: sh ./utils/stop-app.sh {{ app_name }}
       args:
         chdir: /app/{{ app_name }}
 
     - name: Start APP
-      script: ./utils/start-app.sh
+      command: sh ./utils/start-app.sh {{ app_name }}
       args:
         chdir: /app/{{ app_name }}
     
