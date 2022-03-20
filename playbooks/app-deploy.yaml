@@ -71,13 +71,13 @@
 
     - name: Stop APP
       script: ./utils/stop-app.sh
-      # args:
-      #   chdir: /app/{{ app_name }}
+      args:
+        chdir: /app/{{ app_name }}
 
     - name: Start APP
       script: ./utils/start-app.sh
-      # args:
-      #   chdir: /app/{{ app_name }}
+      args:
+        chdir: /app/{{ app_name }}
     
     - name: Open application port
       ufw:
