@@ -2,6 +2,7 @@ pipeline {
      agent none
     environment {
         HOME = '.'
+    }
     stages {
         stage('Install app dependencies') {
             agent {
@@ -32,24 +33,22 @@ pipeline {
                 label 'docker-agent'
             }
             steps {
+                rtServer (
+                    id: 'artifactory-test',
+                    url: 'http://10.0.0.64:8082',
+                    credentialsId: 'local-artifactory'
+                )
+
                 rtUpload (
-                    serverId: 'artifactory-local',
-                    credentialsId: 'local-artifactory',
-                    spec: """{
-                        "files": [
-                            {
-                                "pattern": "dist/*",
-                                "target": "basic-crud-app/dev/"
-                            }
-                        ]
-                    }"""
+                    serverId: 'artifactory-test',
+                    specPath: './upload-spec.json'
                 )
             }
         }
         stage ('Publish build info') {
             steps {
                 rtPublishBuildInfo (
-                    serverId: 'artifactory-local'
+                    serverId: 'artifactory-test'
                 )
             }
         }
