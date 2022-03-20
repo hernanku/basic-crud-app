@@ -70,6 +70,7 @@ pipeline {
             agent any
             steps {
                 echo 'Cleaning docker images'
+                sh "docker logout"
                 sh "docker rmi hernanku/basic-crud-app:$BUILD_NUMBER"
                 sh "docker rmi hernanku/basic-crud-app:latest"
                 echo 'Cleaning workspace'
