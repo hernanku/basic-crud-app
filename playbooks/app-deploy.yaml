@@ -1,6 +1,7 @@
 ---
 - name: Deploy basic-blog-mern app to Linux server
   hosts: all
+  remote_user: devops
   become: true
   environment:
     NODE_ENV: production

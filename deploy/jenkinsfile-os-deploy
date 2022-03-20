@@ -10,22 +10,20 @@ pipeline {
                 docker {
                     label 'docker-agent'
                     image 'hernanku/devops-cli:latest'
+                    args '-u root'
                 }
             }
             steps {
                 echo 'Running ansible deploy playbook'
-                sh 'ansible-playbook -i inventory.yaml app-deploy.yaml'
+                sh 'ansible-playbook -i playbooks/inventory.yaml playbooks/app-deploy.yaml'
             }
         }
         stage('Clean Workspace') {
             agent any
             steps {
-                echo 'Cleaning docker images'
-                sh "docker rmi hernanku/devops-cli:latest"
                 echo 'Cleaning workspace'
                 cleanWs()
             }
         }
     }
 }
-
