@@ -2,6 +2,10 @@ pipeline {
     agent none
     environment {
         HOME = '.'
+        appName = "basic-crud-app"
+        registry = "hernanku/$appName" 
+        registryCredential = 'dockerhub-creds'
+        dockerImage = '' 
     }
     stages {
         stage('Install app dependencies') {
@@ -45,24 +49,33 @@ pipeline {
                 )
             }
         }
-        stage ('Docker build') {
-            agent {
-                label 'docker-agent'
-            }
+        stage('Docker build') { 
+            steps { 
+                script { 
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER" 
+                }
+            } 
+        }
+        stage('Docker push') {
             steps {
-                echo "Starting docker build"
-                // sh "docker build -t hernanku/basic-crud-app:latest ."
                 script {
-                    def customImage = docker.build("hernanku/basic-crud-app:$BUILD_NUMBER")
+                    docker.withRegistry( '', registryCredential ) {
+                        dockerImage.push()
+                        dockerImage.push 'latest'
+                    }
                 }
             }
-        }
+        } 
         stage('Clean Workspace') {
             agent any
             steps {
+                echo 'Cleaning docker images'
+                sh "docker rmi hernanku/basic-crud-app:$BUILD_NUMBER"
+                sh "docker rmi hernanku/basic-crud-app:latest"
                 echo 'Cleaning workspace'
                 cleanWs()
             }
         }
     }
 }
+
