@@ -1,0 +1,6 @@
+node_url: https://deb.nodesource.com/setup_13.x
+git_repo_url: https://github.com/hernanku/basic-crud-app.git
+git_repo_branch: develop
+app_name: basic-crud-app
+app_port: 3000
+

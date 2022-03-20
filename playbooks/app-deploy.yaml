@@ -1,0 +1,86 @@
+---
+- name: Deploy basic-blog-mern app to Linux server
+  hosts: all
+  become: true
+  environment:
+    NODE_ENV: production
+
+  vars:
+    nodejs_version: "13.x"
+    nodejs_install_npm_user: root
+    npm_config_prefix: /root/.npm-global
+    npm_config_unsafe_perm: "true"
+
+
+  tasks:
+    - name: include vars
+      include_vars: 
+        file: vars.yaml
+    - name: Update apt cache
+      apt: 
+        update_cache: true 
+      when: ansible_os_family == 'Debian'
+    
+    - name: Download nodejs install script
+      get_url:
+        url: "{{ node_url }}"
+        dest: /tmp/node_setup
+        mode: 0755
+    
+    - name: Setup nodejs install script
+      command: /tmp/node_setup
+
+    - name: Install reqired packages
+      apt: 
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - git
+        - curl
+        - wget
+        - nodejs
+
+    - name: Create application directory
+      file:
+        path: /app
+        state: directory
+
+    - name: clone app repo
+      git: 
+        repo: "{{ git_repo_url }}"
+        dest: /app/{{ app_name }}
+        version: "{{ git_repo_branch }}"
+        accept_hostkey: yes
+    
+    - name: Install app depedencies
+      npm:
+        path: /app/{{ app_name }}
+        state: present
+    
+    - name: Run npm build
+      command: npm run build
+      args:
+        chdir: /app/{{ app_name }}
+
+    - name: Install pm2
+      npm:
+        name: pm2
+        global: yes
+        production: yes
+        state: present
+
+    - name: Stop APP
+      script: ./utils/stop-app.sh
+      # args:
+      #   chdir: /app/{{ app_name }}
+
+    - name: Start APP
+      script: ./utils/start-app.sh
+      # args:
+      #   chdir: /app/{{ app_name }}
+    
+    - name: Open application port
+      ufw:
+        rule: allow
+        port: "{{ app_port }}"
+

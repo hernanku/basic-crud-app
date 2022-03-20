@@ -84,3 +84,6 @@ typings/
 # extra ignore
 **/.bash_history
 **/.config
+**/.ansible
+**/.ssh
+
