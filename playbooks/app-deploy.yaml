@@ -51,6 +51,7 @@
         dest: /app/{{ app_name }}
         version: "{{ git_repo_branch }}"
         accept_hostkey: yes
+        force: yes
     
     - name: Install app depedencies
       npm:
@@ -69,13 +70,20 @@
         production: yes
         state: present
 
+    - name: Make scripts executable
+      file: 
+        path: /app/{{ app_name }}/utils
+        state: directory
+        mode: +x
+        recurse: yes
+    
     - name: Stop APP
-      command: sh ./utils/stop-app.sh {{ app_name }}
+      command: "./utils/stop-app.sh"
       args:
         chdir: /app/{{ app_name }}
 
     - name: Start APP
-      command: sh ./utils/start-app.sh {{ app_name }}
+      command: "utils/start-app.sh"
       args:
         chdir: /app/{{ app_name }}
     
