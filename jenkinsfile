@@ -1,37 +1,27 @@
 pipeline {
-     agent none
+    agent {
+        docker {
+            label 'docker-agent'
+            image 'node:13.12.0'
+        }
+    }
     environment {
         HOME = '.'
     }
     stages {
         stage('Install app dependencies') {
-            agent {
-                docker {
-                    label 'docker-agent'
-                    image 'node:13.12.0'
-                }
-            }
             steps {
                 echo 'Running npm install'
                 sh 'npm install'
             }
         }
         stage('Code Build') {
-            agent {
-                docker {
-                    label 'docker-agent'
-                    image 'node:13.12.0'
-                }
-            }
             steps {
                 echo 'Running npm build'
                 sh 'npm run build'
             }
         }
         stage ('Upload file') {
-            agent {
-                label 'docker-agent'
-            }
             steps {
                 rtServer (
                     id: 'artifactory-test',
@@ -43,6 +33,12 @@ pipeline {
                     serverId: 'artifactory-test',
                     specPath: './upload-spec.json'
                 )
+            }
+        }
+        stage('Clean Workspace') {
+            steps {
+                echo 'Cleaning workspace'
+                cleanWs()
             }
         }
     }
