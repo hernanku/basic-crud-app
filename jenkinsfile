@@ -32,7 +32,7 @@ pipeline {
                 sh 'npm run build'
             }
         }
-        stage ('Upload file') {
+        stage ('Artifact upload') {
             agent {
                 label 'docker-agent'
             }
